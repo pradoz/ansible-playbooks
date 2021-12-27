@@ -1,0 +1,156 @@
+- name: Config Vim with plugins
+  hosts: localhost
+  gather_facts: yes
+  become: no
+  vars:
+    vim_dir: "{{ ansible_env.HOME }}/.vim"
+    vim_config_dir: "{{ ansible_env.HOME }}/.config/nvim"
+    vimrc: "{{ vim_config_dir }}/init.vim"
+
+  tasks:
+    - name: Update apt repo cache
+      apt:
+        update_cache: yes
+        upgrade: yes
+      become: yes
+
+    # - name: Install OS packages
+    #   package:
+    #     name:
+    #       - git
+    #     state: latest
+    #   become: yes
+
+    - name: Create .vim and .vim/plugged dirs
+      file:
+        path: "{{ item }}"
+        state: directory
+        recurse: no
+        mode: 0750
+      loop:
+        - "{{ vim_config_dir }}"
+        - "{{ vim_dir }}"
+        - "{{ vim_dir }}/plugged"
+        - "{{ vim_dir }}/autoload"
+        - "{{ ansible_env.HOME }}/.local/share/nvim/site/autoload"
+        - "{{ ansible_env.HOME }}/.nvm/versions"
+
+    # - name: Download and Neovim Nightly 0.7
+    #   get_url:
+    #     dest: "{{ ansible_env.HOME }}/nvim.appimage"
+    #     url: "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage"
+
+    # - name: Set Neovim binary to execute, privledged move to /usr/bin/vim
+    #   copy:
+    #     src: "{{ ansible_env.HOME }}/nvim.appimage"
+    #     dest:  "/usr/bin/vim"
+    #     mode: a+x
+    #   become: yes
+
+    # - name: Install vim-plugged plugin manager
+    #   get_url:
+    #     dest: "{{ vim_dir }}/autoload/plug.vim"
+    #     url: "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+
+    # - name: Download vim plugins from github
+    #   git:
+    #     repo: "{{ item.url }}"
+    #     dest: "{{ vim_dir }}/plugged/{{ item.name }}"
+    #     clone: yes
+    #     update: yes
+    #     recursive: no
+    #   loop:
+    #   - name: nvim-plenary
+    #     url: https://github.com/nvim-lua/plenary.nvim
+    #   - name: nvim-popup
+    #     url: https://github.com/nvim-lua/popup.nvim
+    #   - name: telescope
+    #     url: https://github.com/nvim-telescope/telescope.nvim
+    #   - name: completion-nvim
+    #     url: https://github.com/nvim-lua/completion-nvim
+    #   - name: nvim-lspconfig
+    #     url: https://github.com/neovim/nvim-lspconfig
+    #   - name: nvim-cmp
+    #     url: https://github.com/hrsh7th/nvim-cmp
+    #   - name: nvim-treesitter
+    #     url: https://github.com/nvim-treesitter/nvim-treesitter
+    #   - name: gruvbox
+    #     url: https://github.com/gruvbox-community/gruvbox
+    #   - name: vim-fugitive
+    #     url: https://github.com/tpope/vim-fugitive
+
+    # - name: Download dot-files from github
+    #   git:
+    #     repo: https://github.com/pradoz/dot-files
+    #     dest: "{{ ansible_env.HOME }}/dot-files"
+    #     clone: yes
+    #     update: yes
+    #     recursive: no
+
+    # - name: Move dot-files/init.vim to ~/.config/nvim/init.vim
+    #   copy:
+    #     src: "{{ ansible_env.HOME }}/dot-files/init.vim"
+    #     dest: "{{ vimrc }}"
+
+    # - name: Create symlink to from vimrc to /.../init.vim
+    #   file:
+    #     src: "{{ vimrc }}"
+    #     dest: "{{ ansible_env.HOME }}/.vimrc"
+    #     state: link
+
+    # - name: Download and Neovim Nightly 0.7
+    #   get_url:
+    #     dest: "{{ ansible_env.HOME }}/nvim.appimage"
+    #     url: "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage"
+    - name: Download NVM install script
+      get_url:
+        dest: "{{ ansible_env.HOME }}/install_nvm.sh"
+        # dest: /bin/bash
+        url: "https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh"
+
+    - name: Make NVM script executable
+      copy:
+        src: "{{ ansible_env.HOME }}/install_nvm.sh"
+        dest: "{{ ansible_env.HOME }}/install_nvm.sh"
+        mode: a+x
+      become: yes
+
+    - name: Install NVM from script
+      script:  "{{ ansible_env.HOME }}/install_nvm.sh"
+
+
+    - name: Install Node js using NVM
+      shell: '. {{ ansible_env.HOME }}/.nvm/nvm.sh && nvm install --lts && nvm use --lts'
+      # register: nvm_installed
+      args:
+        creates: "{{ ansible_env.HOME }}/.nvm/versions/node"
+        chdir: "{{ ansible_env.HOME }}"
+        executable: /bin/bash
+
+    - name : source bash profile
+      shell: 'source ~/.bashrc'
+      args:
+         executable: /bin/bash
+      # when: nvm_installed | success
+
+    - name: Install NPM-distributed command-line tools
+      npm:
+        global: yes
+        name: "{{ item }}"
+      loop:
+        - pyright
+        - typescript
+        - typescript-language-server
+
+
+
+
+
+
+
+
+
+
+
+
+
