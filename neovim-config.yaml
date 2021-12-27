@@ -14,12 +14,12 @@
         upgrade: yes
       become: yes
 
-    # - name: Install OS packages
-    #   package:
-    #     name:
-    #       - git
-    #     state: latest
-    #   become: yes
+    - name: Install OS packages
+      package:
+        name:
+          - git
+        state: latest
+      become: yes
 
     - name: Create .vim and .vim/plugged dirs
       file:
@@ -35,73 +35,75 @@
         - "{{ ansible_env.HOME }}/.local/share/nvim/site/autoload"
         - "{{ ansible_env.HOME }}/.nvm/versions"
 
-    # - name: Download and Neovim Nightly 0.7
-    #   get_url:
-    #     dest: "{{ ansible_env.HOME }}/nvim.appimage"
-    #     url: "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage"
+    - name: Download and Neovim Nightly 0.7
+      get_url:
+        dest: "{{ ansible_env.HOME }}/nvim.appimage"
+        url: "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage"
 
-    # - name: Set Neovim binary to execute, privledged move to /usr/bin/vim
-    #   copy:
-    #     src: "{{ ansible_env.HOME }}/nvim.appimage"
-    #     dest:  "/usr/bin/vim"
-    #     mode: a+x
-    #   become: yes
+    - name: Set Neovim binary to execute, privledged move to /usr/bin/vim
+      copy:
+        src: "{{ ansible_env.HOME }}/nvim.appimage"
+        dest:  "/usr/bin/vim"
+        mode: a+x
+      become: yes
 
-    # - name: Install vim-plugged plugin manager
-    #   get_url:
-    #     dest: "{{ vim_dir }}/autoload/plug.vim"
-    #     url: "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+    - name: Install vim-plugged plugin manager
+      get_url:
+        dest: "{{ vim_dir }}/autoload/plug.vim"
+        url: "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
 
-    # - name: Download vim plugins from github
-    #   git:
-    #     repo: "{{ item.url }}"
-    #     dest: "{{ vim_dir }}/plugged/{{ item.name }}"
-    #     clone: yes
-    #     update: yes
-    #     recursive: no
-    #   loop:
-    #   - name: nvim-plenary
-    #     url: https://github.com/nvim-lua/plenary.nvim
-    #   - name: nvim-popup
-    #     url: https://github.com/nvim-lua/popup.nvim
-    #   - name: telescope
-    #     url: https://github.com/nvim-telescope/telescope.nvim
-    #   - name: completion-nvim
-    #     url: https://github.com/nvim-lua/completion-nvim
-    #   - name: nvim-lspconfig
-    #     url: https://github.com/neovim/nvim-lspconfig
-    #   - name: nvim-cmp
-    #     url: https://github.com/hrsh7th/nvim-cmp
-    #   - name: nvim-treesitter
-    #     url: https://github.com/nvim-treesitter/nvim-treesitter
-    #   - name: gruvbox
-    #     url: https://github.com/gruvbox-community/gruvbox
-    #   - name: vim-fugitive
-    #     url: https://github.com/tpope/vim-fugitive
+    - name: Download vim plugins from github
+      git:
+        repo: "{{ item.url }}"
+        dest: "{{ vim_dir }}/plugged/{{ item.name }}"
+        clone: yes
+        update: yes
+        recursive: no
+      loop:
+      - name: nvim-plenary
+        url: https://github.com/nvim-lua/plenary.nvim
+      - name: nvim-popup
+        url: https://github.com/nvim-lua/popup.nvim
+      - name: telescope
+        url: https://github.com/nvim-telescope/telescope.nvim
+      - name: completion-nvim
+        url: https://github.com/nvim-lua/completion-nvim
+      - name: nvim-lspconfig
+        url: https://github.com/neovim/nvim-lspconfig
+      - name: nvim-cmp
+        url: https://github.com/hrsh7th/nvim-cmp
+      - name: nvim-treesitter
+        url: https://github.com/nvim-treesitter/nvim-treesitter
+      - name: gruvbox
+        url: https://github.com/gruvbox-community/gruvbox
+      - name: vim-fugitive
+        url: https://github.com/tpope/vim-fugitive
 
-    # - name: Download dot-files from github
-    #   git:
-    #     repo: https://github.com/pradoz/dot-files
-    #     dest: "{{ ansible_env.HOME }}/dot-files"
-    #     clone: yes
-    #     update: yes
-    #     recursive: no
+    - name: Download dot-files from github
+      git:
+        repo: https://github.com/pradoz/dot-files
+        dest: "{{ ansible_env.HOME }}/dot-files"
+        clone: yes
+        update: yes
+        recursive: no
 
-    # - name: Move dot-files/init.vim to ~/.config/nvim/init.vim
-    #   copy:
-    #     src: "{{ ansible_env.HOME }}/dot-files/init.vim"
-    #     dest: "{{ vimrc }}"
+    - name: Move dot-files/init.vim to ~/.config/nvim/init.vim
+      copy:
+        src: "{{ ansible_env.HOME }}/dot-files/init.vim"
+        dest: "{{ vimrc }}"
 
-    # - name: Create symlink to from vimrc to /.../init.vim
-    #   file:
-    #     src: "{{ vimrc }}"
-    #     dest: "{{ ansible_env.HOME }}/.vimrc"
-    #     state: link
+    - name: Create symlink to from vimrc to /.../init.vim
+      file:
+        src: "{{ vimrc }}"
+        dest: "{{ ansible_env.HOME }}/.vimrc"
+        state: link
 
-    # - name: Download and Neovim Nightly 0.7
-    #   get_url:
-    #     dest: "{{ ansible_env.HOME }}/nvim.appimage"
-    #     url: "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage"
+    - name: Download and Neovim Nightly 0.7
+      get_url:
+        dest: "{{ ansible_env.HOME }}/nvim.appimage"
+        url: "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage"
+
+
     - name: Download NVM install script
       get_url:
         dest: "{{ ansible_env.HOME }}/install_nvm.sh"
