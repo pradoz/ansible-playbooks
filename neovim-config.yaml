@@ -91,6 +91,8 @@
       copy:
         src: "{{ ansible_env.HOME }}/dot-files/init.vim"
         dest: "{{ vimrc }}"
+        backup: yes
+        mode: 0640
 
     - name: Create symlink to from vimrc to /.../init.vim
       file:
@@ -107,7 +109,6 @@
     - name: Download NVM install script
       get_url:
         dest: "{{ ansible_env.HOME }}/install_nvm.sh"
-        # dest: /bin/bash
         url: "https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh"
 
     - name: Make NVM script executable
